@@ -1,8 +1,9 @@
 {
   "name": "OctoCAT Supply",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "image": "mcr.microsoft.com/devcontainers/universal",
   "features": {
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/docker-in-docker": {},
+    "ghcr.io/devcontainers-extra/features/act": {}
   },
   "postCreateCommand": "npm ci && gh extension install github/gh-aw && npm install skills",
   "customizations": {

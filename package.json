@@ -16,6 +16,7 @@
     "test": "npm run test --workspaces",
     "test:api": "npm run test --workspace=api",
     "test:frontend": "npm run test --workspace=frontend",
+    "test:workflows": "vitest run --config tests/workflows/vitest.config.ts",
     "lint": "npm run lint --workspace=frontend"
   },
   "devDependencies": {
