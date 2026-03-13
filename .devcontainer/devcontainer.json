@@ -1,6 +1,9 @@
 {
   "name": "OctoCAT Supply",
   "image": "mcr.microsoft.com/devcontainers/universal",
+  "hostRequirements": {
+    "storage": "32GB"
+  },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker": {},
     "ghcr.io/devcontainers-extra/features/act": {}
