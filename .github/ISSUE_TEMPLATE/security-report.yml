@@ -1,0 +1,24 @@
+name: Security report
+description: Capture a security signal so GH-AW remediation workflows can triage it without replacing scanner ownership.
+title: "[Security]: "
+labels: [security, human-review]
+body:
+  - type: textarea
+    id: source
+    attributes:
+      label: Signal source
+      description: Was this raised by Snyk, GitHub code scanning, Dependabot, CI, or a manual review?
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Finding details
+      description: Include package names, alert IDs, vulnerable paths, severity, and links.
+    validations:
+      required: true
+  - type: textarea
+    id: remediation
+    attributes:
+      label: Remediation notes
+      description: Capture known fix versions, mitigations, or review expectations.

@@ -1,0 +1,22 @@
+name: Feature request
+description: Request a backlog item that can be triaged into the AI-driven SDLC demo.
+title: "[Feature]: "
+labels: [feature, needs-triage]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What user or business problem should this change address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the capability, expected behavior, and any non-goals.
+  - type: textarea
+    id: release
+    attributes:
+      label: Release or compatibility considerations
+      description: Note any release-note, migration, or breaking-change concerns.
