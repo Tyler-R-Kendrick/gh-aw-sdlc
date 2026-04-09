@@ -1,0 +1,22 @@
+name: Architecture review
+description: Request architecture governance or document potential drift for the outer loop.
+title: "[Architecture]: "
+labels: [architecture, human-review]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Change context
+      description: What change, decision, or drift risk should be reviewed?
+    validations:
+      required: true
+  - type: textarea
+    id: principles
+    attributes:
+      label: Principles or boundaries involved
+      description: Reference the relevant rules from docs/architecture/architecture-principles.md or .architecture.yml.
+  - type: textarea
+    id: guidance
+    attributes:
+      label: Decision needed
+      description: What decision or recommendation is needed from maintainers?

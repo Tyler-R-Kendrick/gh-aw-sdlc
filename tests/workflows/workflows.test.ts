@@ -1,13 +1,133 @@
-import { describe, it, expect, beforeAll } from 'vitest'
-import { execSync } from 'child_process'
-import { readFileSync, existsSync } from 'fs'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { execFileSync, spawnSync } from 'child_process'
+import { existsSync, readdirSync, readFileSync } from 'fs'
 import { resolve } from 'path'
 
 const REPO_ROOT = resolve(__dirname, '../..')
 const WORKFLOWS_DIR = resolve(REPO_ROOT, '.github/workflows')
-const EVENTS_DIR = resolve(__dirname, 'events')
+const DOCS_DIR = resolve(REPO_ROOT, 'docs')
+const ISSUE_TEMPLATE_DIR = resolve(REPO_ROOT, '.github/ISSUE_TEMPLATE')
 
-const WORKFLOW_NAMES = ['snyk-security-triage', 'snyk-fix-pr', 'snyk-review-manage'] as const
+const WORKFLOW_SPECS = [
+  {
+    name: 'issue-triage',
+    classification: 'Adopt with light adaptation',
+    loop: 'outer',
+    source: 'gh-aw auto-triage-issues',
+    triggerPatterns: [/issues:/, /opened/, /edited/, /schedule:/, /workflow_dispatch:/],
+  },
+  {
+    name: 'pr-contribution-check',
+    classification: 'Adapt',
+    loop: 'inner',
+    source: 'gh-aw contribution-check',
+    triggerPatterns: [/pull_request:/, /opened/, /synchronize/, /ready_for_review/],
+  },
+  {
+    name: 'ci-doctor',
+    classification: 'Adopt',
+    loop: 'inner',
+    source: 'gh-aw ci-doctor',
+    triggerPatterns: [/workflow_run:/, /workflow_dispatch:/],
+  },
+  {
+    name: 'code-scanning-fixer',
+    classification: 'Adopt, then lightly extend',
+    loop: 'inner',
+    source: 'gh-aw code-scanning-fixer',
+    triggerPatterns: [/workflow_dispatch:/, /schedule:/],
+  },
+  {
+    name: 'snyk-remediation',
+    classification: 'Custom derivative from a proven pattern',
+    loop: 'inner',
+    source: 'Derivative of gh-aw code-scanning-fixer',
+    triggerPatterns: [/schedule:/, /workflow_dispatch:/],
+  },
+  {
+    name: 'breaking-change-checker',
+    classification: 'Adopt with policy adaptation',
+    loop: 'inner + outer',
+    source: 'gh-aw breaking-change-checker',
+    triggerPatterns: [/schedule:/, /workflow_dispatch:/],
+  },
+  {
+    name: 'architecture-guardian',
+    classification: 'Adopt with repo-specific rules',
+    loop: 'outer',
+    source: 'gh-aw architecture-guardian',
+    triggerPatterns: [/schedule:/, /workflow_dispatch:/],
+  },
+  {
+    name: 'changeset-generator',
+    classification: 'Adopt',
+    loop: 'inner',
+    source: 'gh-aw changeset',
+    triggerPatterns: [/pull_request:/, /labeled/, /workflow_dispatch:/],
+  },
+  {
+    name: 'daily-repo-status',
+    classification: 'Adapt',
+    loop: 'outer',
+    source: 'GH-AW quick start pattern',
+    triggerPatterns: [/schedule:/, /workflow_dispatch:/],
+  },
+  {
+    name: 'merged-pr-report',
+    classification: 'Adopt with repo-specific reporting adjustments',
+    loop: 'outer',
+    source: 'gh-aw copilot-pr-merged-report',
+    triggerPatterns: [/schedule:/, /workflow_dispatch:/],
+  },
+  {
+    name: 'resource-staleness-report',
+    classification: 'Adopt',
+    loop: 'outer',
+    source: 'awesome-copilot resource-staleness-report',
+    triggerPatterns: [/schedule:/, /workflow_dispatch:/],
+  },
+  {
+    name: 'pr-duplicate-check',
+    classification: 'Conditional adopt',
+    loop: 'inner',
+    source: 'awesome-copilot pr-duplicate-check',
+    triggerPatterns: [/pull_request:/, /opened/, /synchronize/],
+  },
+] as const
+
+const REQUIRED_DOCS = [
+  'sdlc-agent-map.md',
+  'inner-loop.md',
+  'outer-loop.md',
+  'repo-demo-scenarios.md',
+  'operations.md',
+]
+
+const REQUIRED_ISSUE_TEMPLATES = [
+  'bug-report.yml',
+  'feature-request.yml',
+  'security-report.yml',
+  'architecture-review.yml',
+]
+
+function run(command: string, args: string[] = []): string {
+  return execFileSync(command, args, {
+    cwd: REPO_ROOT,
+    encoding: 'utf-8',
+    timeout: 60_000,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  })
+}
+
+function runMerged(command: string, args: string[] = []): string {
+  const result = spawnSync(command, args, {
+    cwd: REPO_ROOT,
+    encoding: 'utf-8',
+    timeout: 60_000,
+  })
+
+  return (result.stdout ?? '') + (result.stderr ?? '')
+}
 
 function readWorkflow(name: string): string {
   return readFileSync(resolve(WORKFLOWS_DIR, `${name}.md`), 'utf-8')
@@ -17,323 +137,150 @@ function readLockFile(name: string): string {
   return readFileSync(resolve(WORKFLOWS_DIR, `${name}.lock.yml`), 'utf-8')
 }
 
-function run(cmd: string): string {
-  return execSync(cmd, { cwd: REPO_ROOT, encoding: 'utf-8', timeout: 30_000, stdio: ['pipe', 'pipe', 'pipe'] })
-}
-
-function runSafe(cmd: string): string {
-  try {
-    return execSync(cmd, { cwd: REPO_ROOT, encoding: 'utf-8', timeout: 30_000, stdio: ['pipe', 'pipe', 'pipe'] })
-  } catch (e: any) {
-    return (e.stdout ?? '') + (e.stderr ?? '')
-  }
-}
-
-function hasDocker(): boolean {
-  try {
-    execSync('docker info', { timeout: 5_000, stdio: ['pipe', 'pipe', 'pipe'] })
-    return true
-  } catch {
-    return false
-  }
-}
-
-// ─── Prerequisites ───────────────────────────────────────────────────────────
-
-describe('Prerequisites', () => {
+describe('Workflow prerequisites', () => {
   it('act is installed', () => {
-    const output = run('act --version')
-    expect(output).toMatch(/act version/)
+    expect(runMerged('act', ['--version'])).toMatch(/act version/i)
   })
 
   it('gh-aw CLI is installed', () => {
-    const output = run('gh aw version')
-    expect(output).toMatch(/gh aw version/)
+    expect(runMerged('gh', ['aw', 'version'])).toMatch(/gh aw version/i)
   })
 })
 
-// ─── Workflow Markdown Files ─────────────────────────────────────────────────
-
-describe('Workflow files exist', () => {
-  it.each(WORKFLOW_NAMES)('%s.md exists', (name) => {
-    expect(existsSync(resolve(WORKFLOWS_DIR, `${name}.md`))).toBe(true)
+describe('Repository scaffolding', () => {
+  it('includes the required workflow markdown files', () => {
+    for (const { name } of WORKFLOW_SPECS) {
+      expect(existsSync(resolve(WORKFLOWS_DIR, `${name}.md`))).toBe(true)
+    }
   })
 
-  it.each(WORKFLOW_NAMES)('%s.lock.yml exists', (name) => {
-    expect(existsSync(resolve(WORKFLOWS_DIR, `${name}.lock.yml`))).toBe(true)
+  it('includes the required lock files', () => {
+    for (const { name } of WORKFLOW_SPECS) {
+      expect(existsSync(resolve(WORKFLOWS_DIR, `${name}.lock.yml`))).toBe(true)
+    }
+  })
+
+  it('contains the expected docs, templates, and architecture assets', () => {
+    for (const doc of REQUIRED_DOCS) {
+      expect(existsSync(resolve(DOCS_DIR, doc))).toBe(true)
+    }
+
+    expect(existsSync(resolve(DOCS_DIR, 'architecture/architecture-principles.md'))).toBe(true)
+    expect(existsSync(resolve(REPO_ROOT, '.architecture.yml'))).toBe(true)
+    expect(existsSync(resolve(REPO_ROOT, '.changeset/README.md'))).toBe(true)
+    expect(existsSync(resolve(REPO_ROOT, '.github/PULL_REQUEST_TEMPLATE.md'))).toBe(true)
+    expect(existsSync(resolve(REPO_ROOT, '.github/labels.yml'))).toBe(true)
+    expect(existsSync(resolve(REPO_ROOT, 'CONTRIBUTING.md'))).toBe(true)
+  })
+
+  it('contains the issue templates required for intake and governance demos', () => {
+    for (const template of REQUIRED_ISSUE_TEMPLATES) {
+      expect(existsSync(resolve(ISSUE_TEMPLATE_DIR, template))).toBe(true)
+    }
   })
 })
 
-// ─── Compilation ─────────────────────────────────────────────────────────────
-
-describe('Compilation', () => {
-  let compileOutput: string
+describe('Workflow compilation', () => {
+  let compileOutput = ''
 
   beforeAll(() => {
-    compileOutput = runSafe('gh aw compile --no-emit 2>&1')
+    compileOutput = runMerged('gh', ['aw', 'compile', '--no-emit'])
   })
 
   it('compiles without errors', () => {
     expect(compileOutput).toContain('0 error(s)')
   })
 
-  it('detects all 3 workflows', () => {
-    expect(compileOutput).toContain('Compiled 3 workflow(s)')
+  it('compiles the full workflow inventory', () => {
+    expect(compileOutput).toContain(`Compiled ${WORKFLOW_SPECS.length} workflow(s)`)
+  })
+
+  it('keeps only the expected markdown workflows in .github/workflows', () => {
+    const markdownWorkflows = readdirSync(WORKFLOWS_DIR)
+      .filter((file) => file.endsWith('.md'))
+      .sort()
+
+    expect(markdownWorkflows).toEqual(WORKFLOW_SPECS.map(({ name }) => `${name}.md`).sort())
   })
 })
 
-// ─── Frontmatter Validation ─────────────────────────────────────────────────
+describe.each(WORKFLOW_SPECS)('Workflow metadata: $name', ({ name, classification, loop, source, triggerPatterns }) => {
+  let workflow = ''
 
-describe('Frontmatter: snyk-security-triage', () => {
-  let content: string
-  beforeAll(() => { content = readWorkflow('snyk-security-triage') })
-
-  it('has schedule trigger', () => {
-    expect(content).toMatch(/schedule/)
+  beforeAll(() => {
+    workflow = readWorkflow(name)
   })
 
-  it('has workflow_dispatch trigger', () => {
-    expect(content).toMatch(/workflow_dispatch/)
+  it('documents its provenance and SDLC placement', () => {
+    expect(workflow).toContain('## Workflow Metadata')
+    expect(workflow).toContain(`- Source Example: ${source}`)
+    expect(workflow).toContain(`- Classification: ${classification}`)
+    expect(workflow).toContain(`- Loop Placement: ${loop}`)
   })
 
-  it('uses copilot engine', () => {
-    expect(content).toMatch(/engine:\s*copilot/)
-  })
-})
-
-describe('Frontmatter: snyk-fix-pr', () => {
-  let content: string
-  beforeAll(() => { content = readWorkflow('snyk-fix-pr') })
-
-  it('triggers on issues event', () => {
-    expect(content).toMatch(/issues/)
-  })
-
-  it('triggers on labeled type', () => {
-    expect(content).toMatch(/labeled/)
-  })
-
-  it('has concurrency control', () => {
-    expect(content).toMatch(/concurrency/)
-  })
-
-  it('uses copilot engine', () => {
-    expect(content).toMatch(/engine:\s*copilot/)
+  it('contains the expected triggers in frontmatter', () => {
+    for (const pattern of triggerPatterns) {
+      expect(workflow).toMatch(pattern)
+    }
   })
 })
 
-describe('Frontmatter: snyk-review-manage', () => {
-  let content: string
-  beforeAll(() => { content = readWorkflow('snyk-review-manage') })
+describe.each(WORKFLOW_SPECS)('Lock file structure: $name', ({ name }) => {
+  let lock = ''
 
-  it('triggers on pull_request_review', () => {
-    expect(content).toMatch(/pull_request_review/)
+  beforeAll(() => {
+    lock = readLockFile(name)
   })
 
-  it('triggers on submitted type', () => {
-    expect(content).toMatch(/submitted/)
-  })
-
-  it('uses copilot engine', () => {
-    expect(content).toMatch(/engine:\s*copilot/)
-  })
-})
-
-// ─── Lock File Structure ─────────────────────────────────────────────────────
-
-describe.each(WORKFLOW_NAMES)('Lock file structure: %s', (name) => {
-  let lock: string
-  beforeAll(() => { lock = readLockFile(name) })
-
-  it('has activation job', () => {
+  it('contains the standard activation and agent jobs', () => {
     expect(lock).toMatch(/^\s{2}activation:/m)
-  })
-
-  it('has agent job', () => {
     expect(lock).toMatch(/^\s{2}agent:/m)
   })
 
-  it('engine is copilot', () => {
-    expect(lock).toContain('GH_AW_INFO_ENGINE_ID: "copilot"')
-  })
-
-  it('has strict mode enabled', () => {
-    expect(lock).toContain('"strict":true')
-  })
-
-  it('validates COPILOT_GITHUB_TOKEN', () => {
-    expect(lock).toContain('COPILOT_GITHUB_TOKEN')
-  })
-
-  it('has pinned checkout action (SHA)', () => {
-    expect(lock).toMatch(/actions\/checkout@[a-f0-9]{40}/)
-  })
-
-  it('imports correct .md file', () => {
+  it('pins the runtime import back to the markdown workflow', () => {
     expect(lock).toContain(`runtime-import .github/workflows/${name}.md`)
   })
-})
 
-// ─── Trigger-Specific Lock File Validation ───────────────────────────────────
-
-describe('Lock file triggers', () => {
-  it('snyk-security-triage has schedule + workflow_dispatch', () => {
-    const lock = readLockFile('snyk-security-triage')
-    expect(lock).toMatch(/schedule:/)
-    expect(lock).toMatch(/workflow_dispatch:/)
-  })
-
-  it('snyk-fix-pr triggers on issues:labeled', () => {
-    const lock = readLockFile('snyk-fix-pr')
-    expect(lock).toMatch(/issues:/)
-    expect(lock).toMatch(/labeled/)
-  })
-
-  it('snyk-fix-pr has issue-scoped concurrency', () => {
-    const lock = readLockFile('snyk-fix-pr')
-    expect(lock).toMatch(/snyk-fix-.*github\.event\.issue\.number/)
-  })
-
-  it('snyk-review-manage triggers on pull_request_review:submitted', () => {
-    const lock = readLockFile('snyk-review-manage')
-    expect(lock).toMatch(/pull_request_review:/)
-    expect(lock).toMatch(/submitted/)
+  it('uses the Copilot engine and validates tokens', () => {
+    expect(lock).toContain('GH_AW_INFO_ENGINE_ID: "copilot"')
+    expect(lock).toContain('COPILOT_GITHUB_TOKEN')
   })
 })
 
-// ─── act Workflow Parsing ────────────────────────────────────────────────────
-
-describe('act workflow parsing', () => {
-  it.each(WORKFLOW_NAMES)('act -l parses %s.lock.yml and finds activation + agent jobs', (name) => {
-    const output = runSafe(`act -l -W ${WORKFLOWS_DIR}/${name}.lock.yml 2>&1`)
+describe('Workflow lock files can be parsed by act', () => {
+  it.each(WORKFLOW_SPECS)('%s.lock.yml is parseable by act', ({ name }) => {
+    const output = runMerged('act', ['-l', '-W', `${WORKFLOWS_DIR}/${name}.lock.yml`])
     expect(output).toContain('activation')
     expect(output).toContain('agent')
   })
 })
 
-// ─── act Event Trigger Matching ──────────────────────────────────────────────
+describe('Setup prerequisites for coding agents', () => {
+  const devcontainer = readFileSync(resolve(REPO_ROOT, '.devcontainer/devcontainer.json'), 'utf-8')
+  const copilotSetup = readFileSync(resolve(WORKFLOWS_DIR, 'copilot-setup-steps.yml'), 'utf-8')
 
-describe('act event trigger isolation', () => {
-  it('snyk-security-triage does NOT trigger on issues', () => {
-    const output = runSafe(`act -l issues -W ${WORKFLOWS_DIR}/snyk-security-triage.lock.yml 2>&1`)
-    expect(output).not.toMatch(/activation\s/)
+  it('installs gh-aw in the dev container', () => {
+    expect(devcontainer).toMatch(/gh aw version|install-gh-aw\.sh|gh extension install github\/gh-aw/)
   })
 
-  it('snyk-fix-pr does NOT trigger on pull_request_review', () => {
-    const output = runSafe(`act -l pull_request_review -W ${WORKFLOWS_DIR}/snyk-fix-pr.lock.yml 2>&1`)
-    expect(output).not.toMatch(/activation\s/)
-  })
-
-  it('snyk-review-manage does NOT trigger on issues', () => {
-    const output = runSafe(`act -l issues -W ${WORKFLOWS_DIR}/snyk-review-manage.lock.yml 2>&1`)
-    expect(output).not.toMatch(/activation\s/)
+  it('installs gh-aw in copilot setup steps', () => {
+    expect(copilotSetup).toMatch(/install-gh-aw\.sh|gh extension install github\/gh-aw/)
+    expect(copilotSetup).toMatch(/gh aw version/)
   })
 })
 
-// ─── act Dry-Run (requires Docker) ──────────────────────────────────────────
+describe('Documentation map', () => {
+  const map = readFileSync(resolve(DOCS_DIR, 'sdlc-agent-map.md'), 'utf-8')
 
-describe.runIf(hasDocker())('act dry-run (Docker available)', () => {
-  it('snyk-security-triage dry-runs on workflow_dispatch', () => {
-    const output = runSafe(
-      `act -n workflow_dispatch -W ${WORKFLOWS_DIR}/snyk-security-triage.lock.yml 2>&1`
-    )
-    expect(output).toMatch(/activation|Stage/i)
+  it('lists every workflow in the SDLC map', () => {
+    for (const { name } of WORKFLOW_SPECS) {
+      expect(map).toContain(name)
+    }
   })
 
-  it('snyk-fix-pr dry-runs on issues with event payload', () => {
-    const output = runSafe(
-      `act -n issues -W ${WORKFLOWS_DIR}/snyk-fix-pr.lock.yml -e ${EVENTS_DIR}/issue-labeled.json 2>&1`
-    )
-    expect(output).toMatch(/activation|pre_activation|Stage/i)
-  })
-
-  it('snyk-review-manage dry-runs on approved review', () => {
-    const output = runSafe(
-      `act -n pull_request_review -W ${WORKFLOWS_DIR}/snyk-review-manage.lock.yml -e ${EVENTS_DIR}/pr-review-approved.json 2>&1`
-    )
-    expect(output).toMatch(/activation|pre_activation|Stage/i)
-  })
-
-  it('snyk-review-manage dry-runs on changes_requested review', () => {
-    const output = runSafe(
-      `act -n pull_request_review -W ${WORKFLOWS_DIR}/snyk-review-manage.lock.yml -e ${EVENTS_DIR}/pr-review-changes-requested.json 2>&1`
-    )
-    expect(output).toMatch(/activation|pre_activation|Stage/i)
-  })
-})
-
-// ─── Copilot Setup Steps ────────────────────────────────────────────────────
-
-describe('Copilot setup steps', () => {
-  let content: string
-  beforeAll(() => {
-    content = readFileSync(resolve(WORKFLOWS_DIR, 'copilot-setup-steps.yml'), 'utf-8')
-  })
-
-  it('installs Snyk CLI', () => {
-    expect(content).toContain('npm install -g snyk')
-  })
-
-  it('runs npm ci', () => {
-    expect(content).toContain('npm ci')
-  })
-
-  it('sets up Node.js', () => {
-    expect(content).toContain('node-version')
-  })
-})
-
-// ─── Workflow Content Validation ─────────────────────────────────────────────
-
-describe('Workflow instructions: snyk-security-triage', () => {
-  let content: string
-  beforeAll(() => { content = readWorkflow('snyk-security-triage') })
-
-  it('instructs agent to run snyk test', () => {
-    expect(content).toMatch(/snyk test/i)
-  })
-
-  it('instructs duplicate checking', () => {
-    expect(content).toMatch(/duplicate|existing.*issue|already.*exist/i)
-  })
-})
-
-describe('Workflow instructions: snyk-fix-pr', () => {
-  let content: string
-  beforeAll(() => { content = readWorkflow('snyk-fix-pr') })
-
-  it('instructs creating draft PR', () => {
-    expect(content).toMatch(/draft/i)
-  })
-
-  it('instructs running tests', () => {
-    expect(content).toMatch(/npm test/i)
-  })
-
-  it('instructs requesting Copilot review', () => {
-    expect(content).toMatch(/copilot/i)
-    expect(content).toMatch(/review/i)
-  })
-})
-
-describe('Workflow instructions: snyk-review-manage', () => {
-  let content: string
-  beforeAll(() => { content = readWorkflow('snyk-review-manage') })
-
-  it('uses @copilot for feedback relay', () => {
-    expect(content).toContain('@copilot')
-  })
-
-  it('assigns Tyler-R-Kendrick as reviewer', () => {
-    expect(content).toContain('Tyler-R-Kendrick')
-  })
-
-  it('handles both approved and changes_requested states', () => {
-    expect(content).toMatch(/approved/i)
-    expect(content).toMatch(/changes_requested|changes requested|requests changes/i)
-  })
-
-  it('converts draft to ready with gh pr ready', () => {
-    expect(content).toMatch(/gh pr ready/i)
+  it('clearly separates inner and outer loop terminology', () => {
+    expect(map).toMatch(/Inner \/ Outer Loop/)
+    expect(map).toMatch(/inner/)
+    expect(map).toMatch(/outer/)
   })
 })

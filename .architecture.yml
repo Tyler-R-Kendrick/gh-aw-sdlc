@@ -1,0 +1,49 @@
+thresholds:
+  file_lines_blocker: 1200
+  file_lines_warning: 600
+  function_lines: 100
+  max_exports: 20
+
+boundaries:
+  - name: frontend
+    paths:
+      - frontend/**
+    may_depend_on:
+      - frontend/**
+      - docs/**
+  - name: api
+    paths:
+      - api/**
+    may_depend_on:
+      - api/**
+      - docs/**
+  - name: automation
+    paths:
+      - .github/**
+      - docs/**
+      - .changeset/**
+    may_depend_on:
+      - .github/**
+      - docs/**
+      - .changeset/**
+
+prohibited_dependencies:
+  - from: frontend/**
+    to: api/src/**
+    reason: Frontend should consume server behavior through HTTP contracts, not shared runtime imports.
+  - from: api/**
+    to: frontend/**
+    reason: API services must not depend on frontend implementation details.
+  - from: .github/workflows/*.md
+    to: api/src/**
+    reason: Agentic workflows should stay declarative and operate through repo and CI signals.
+
+contracts:
+  - name: API contract
+    paths:
+      - api/api-swagger.json
+    policy: Treat removed routes, renamed fields, and required-field additions as release-risk events.
+  - name: Release metadata
+    paths:
+      - .changeset/**
+    policy: User-visible changes should ship with a reviewed changeset entry.

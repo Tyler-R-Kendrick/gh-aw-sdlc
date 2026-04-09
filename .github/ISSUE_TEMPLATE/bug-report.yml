@@ -1,0 +1,29 @@
+name: Bug report
+description: Report a defect that should flow through issue triage and the inner-loop delivery process.
+title: "[Bug]: "
+labels: [bug, needs-triage]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the defect, expected behavior, and actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who is affected and how severe is the problem?
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: Share the steps, logs, screenshots, or traces that make the bug reproducible.
+  - type: dropdown
+    id: handoff
+    attributes:
+      label: Preferred next step
+      options:
+        - Coding-agent implementation is likely safe
+        - Human investigation needed first
