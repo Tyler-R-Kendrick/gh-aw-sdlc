@@ -3,10 +3,9 @@
 	"hostRequirements": {
 		"cpus": 4,
 		"memory": "8gb",
-		"storage": "32gb"
+		"storage": "64gb"
 	},
 	"features": {
-    	"ghcr.io/devcontainers/features/docker-in-docker": {},
 		"ghcr.io/devcontainers-extra/features/act:1": {},
 		"ghcr.io/devcontainers/features/github-cli:1": {}
 	},
