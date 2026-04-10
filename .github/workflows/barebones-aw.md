@@ -7,6 +7,10 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+engine:
+  id: copilot
+  env:
+    COPILOT_MODEL: gpt-41-copilot
 safe-outputs:
   noop:
 timeout-minutes: 5
