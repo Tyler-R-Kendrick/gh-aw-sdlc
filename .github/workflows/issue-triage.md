@@ -10,7 +10,11 @@ on:
 permissions:
   contents: read
   issues: read
-engine: copilot
+engine:
+  id: copilot
+  version: 1.0.10
+  env:
+    COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
 strict: true
 tools:
   github:
@@ -60,4 +64,5 @@ Convert raw issue intake into backlog-ready signals without hiding human ownersh
    - whether the next best step is coding-agent work or human review.
 6. During scheduled/manual runs, process only unlabeled or weakly labeled issues and leave already-triaged issues untouched.
 7. Never close issues, never assign milestones automatically, and never remove labels added by humans unless they are clearly wrong and the reason is stated in the comment.
-8. If no action is needed, call `noop` and explain why.
+8. Use the provided GitHub MCP and safe-output tools directly; do not rely on shell commands, network fetches, sub-agents, or skills for issue reads or workflow outputs.
+9. If no action is needed, call `noop` and explain why.
