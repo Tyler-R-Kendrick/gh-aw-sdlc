@@ -17,7 +17,7 @@ engine:
     COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
 
 features:
-  copilot-requests: true
+  action-tag: "v0.67.1"
 
 tools:
   github:
