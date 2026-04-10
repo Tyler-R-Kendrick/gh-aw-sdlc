@@ -39,13 +39,6 @@ const WORKFLOW_SPECS = [
     triggerPatterns: [/workflow_dispatch:/, /schedule:/],
   },
   {
-    name: 'snyk-remediation',
-    classification: 'Custom derivative from a proven pattern',
-    loop: 'inner',
-    source: 'Derivative of gh-aw code-scanning-fixer',
-    triggerPatterns: [/schedule:/, /workflow_dispatch:/],
-  },
-  {
     name: 'breaking-change-checker',
     classification: 'Adopt with policy adaptation',
     loop: 'inner + outer',

@@ -10,7 +10,11 @@ on:
 permissions:
   contents: read
   issues: read
-engine: copilot
+engine:
+  id: copilot
+  version: 1.0.10
+  env:
+    COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
 strict: true
 tools:
   github:
@@ -63,3 +67,4 @@ Convert raw issue intake into backlog-ready signals without hiding human ownersh
 8. If a scheduled/manual run finds no unlabeled or weakly labeled issues, call `noop` with a message like `No action needed: scheduled backlog sweep found no unlabeled or weakly labeled issues.`
 9. If GitHub reads are unavailable or the run lacks enough issue data to triage safely, call `noop` explaining the blocker instead of ending with prose only or attempting unsupported tools.
 10. Never close issues, never assign milestones automatically, and never remove labels added by humans unless they are clearly wrong and the reason is stated in the comment.
+11. Use the provided safe-output tools directly for labels, comments, and no-op results; do not route workflow outputs through shell commands, network fetches, sub-agents, or skills.

@@ -63,4 +63,6 @@ Serve as the inner-loop control point for pull requests without replacing human 
    - `pr-duplicate-check` if the PR adds prompts, docs, templates, workflow specs, or reusable AI assets.
 5. Apply advisory labels only when they help humans route work (`needs-tests`, `needs-security-review`, `needs-changeset`, `architecture-impact`).
 6. Never block or merge the PR. Keep the output constructive, transparent, and actionable.
-7. If the PR is obviously docs-only or otherwise needs no extra guidance, call `noop` with that conclusion.
+7. Always finalize the workflow by calling exactly one safe output: `add-comment` with the structured evaluation, `add-labels` when advisory labels apply without a comment, or `noop`. Never end with prose analysis only.
+8. Call `noop` with a brief explanation when: the PR is docs-only or a trivial fix with no quality concerns, the PR context is insufficient to evaluate safely, or no meaningful advisory is possible for the changes.
+9. If GitHub reads are unavailable or the PR diff cannot be retrieved, call `noop` explaining the blocker instead of ending with prose only or attempting unsupported tools.
