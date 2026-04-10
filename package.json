@@ -16,7 +16,7 @@
     "test": "npm run test --workspaces",
     "test:api": "npm run test --workspace=api",
     "test:frontend": "npm run test --workspace=frontend",
-    "test:workflows": "echo 'No workflow tests'",
+    "test:workflows": "gh aw validate",
     "lint": "npm run lint --workspace=frontend"
   },
   "devDependencies": {
