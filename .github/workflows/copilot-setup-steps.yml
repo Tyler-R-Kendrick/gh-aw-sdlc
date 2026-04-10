@@ -17,6 +17,23 @@ jobs:
           node-version: "22"
           cache: "npm"
 
+      - name: Install act
+        shell: bash
+        run: |
+          ACT_VERSION="v0.2.87"
+          ACT_ARCHIVE="act_Linux_x86_64.tar.gz"
+          ACT_SHA256="9bbfca7d779f71746233ec65e47fdcb12c4c976c1c97ec085956976fcabee866"
+
+          if command -v act >/dev/null 2>&1; then
+            act --version
+            exit 0
+          fi
+
+          curl -fsSL -o "/tmp/${ACT_ARCHIVE}" "https://github.com/nektos/act/releases/download/${ACT_VERSION}/${ACT_ARCHIVE}"
+          echo "${ACT_SHA256}  /tmp/${ACT_ARCHIVE}" | sha256sum -c -
+          sudo tar -xzf "/tmp/${ACT_ARCHIVE}" -C /usr/local/bin act
+          act --version
+
       - name: Install JavaScript dependencies
         run: npm ci
 
