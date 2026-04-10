@@ -10,7 +10,11 @@ permissions:
   issues: read
   pull-requests: read
   actions: read
-engine: copilot
+engine:
+  id: copilot
+  version: 1.0.10
+  env:
+    COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
 strict: true
 tools:
   github:

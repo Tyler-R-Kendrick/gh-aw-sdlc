@@ -7,7 +7,11 @@ on:
 permissions:
   contents: read
   pull-requests: read
-engine: copilot
+engine:
+  id: copilot
+  version: 1.0.10
+  env:
+    COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
 strict: true
 tools:
   github:
