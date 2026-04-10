@@ -66,7 +66,7 @@ Commit both the markdown workflow and the generated `.lock.yml` file.
 
 ## Run the demo
 1. Install prerequisites and open the dev container.
-2. Verify `gh aw version` works.
+2. Verify `act --version` and `gh aw version` work.
 3. Run `npm run test:workflows` to validate the workflow inventory.
 4. Open an issue or PR and trigger the relevant GH-AW workflow from the Actions tab.
 5. Use `docs/repo-demo-scenarios.md` as the guided walkthrough.

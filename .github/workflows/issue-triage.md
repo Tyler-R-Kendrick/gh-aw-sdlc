@@ -62,7 +62,9 @@ Convert raw issue intake into backlog-ready signals without hiding human ownersh
    - what signal triggered the workflow,
    - what category labels were chosen,
    - whether the next best step is coding-agent work or human review.
-6. During scheduled/manual runs, process only unlabeled or weakly labeled issues and leave already-triaged issues untouched.
-7. Never close issues, never assign milestones automatically, and never remove labels added by humans unless they are clearly wrong and the reason is stated in the comment.
-8. Use the provided GitHub MCP and safe-output tools directly; do not rely on shell commands, network fetches, sub-agents, or skills for issue reads or workflow outputs.
-9. If no action is needed, call `noop` and explain why.
+6. Use GitHub MCP tools for GitHub reads. Do not use shell `gh`, `curl`, or unsupported helper tools to inspect issues.
+7. During scheduled/manual runs, process only unlabeled or weakly labeled issues and leave already-triaged issues untouched.
+8. If a scheduled/manual run finds no unlabeled or weakly labeled issues, call `noop` with a message like `No action needed: scheduled backlog sweep found no unlabeled or weakly labeled issues.`
+9. If GitHub reads are unavailable or the run lacks enough issue data to triage safely, call `noop` explaining the blocker instead of ending with prose only or attempting unsupported tools.
+10. Never close issues, never assign milestones automatically, and never remove labels added by humans unless they are clearly wrong and the reason is stated in the comment.
+11. Use the provided safe-output tools directly for labels, comments, and no-op results; do not route workflow outputs through shell commands, network fetches, sub-agents, or skills.
