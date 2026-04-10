@@ -8,6 +8,7 @@ on:
 
 permissions:
   issues: read
+  contents: read
 
 tools:
   github:
