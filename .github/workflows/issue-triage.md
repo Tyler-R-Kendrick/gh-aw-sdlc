@@ -16,7 +16,6 @@ engine:
   version: latest
   env:
     COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
-    GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
 
 tools:
   github:
