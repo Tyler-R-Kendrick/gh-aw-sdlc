@@ -11,6 +11,7 @@ engine:
   id: copilot
   env:
     COPILOT_MODEL: gpt-41-copilot
+    COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
 safe-outputs:
   noop:
 timeout-minutes: 5
