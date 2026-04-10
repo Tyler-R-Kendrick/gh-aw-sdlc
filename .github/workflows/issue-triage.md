@@ -3,7 +3,8 @@ timeout-minutes: 5
 
 on:
   issues:
-    types: [opened, reopened]
+    types: [opened, reopened, edited]
+  workflow_dispatch:
 
 permissions:
   issues: read
