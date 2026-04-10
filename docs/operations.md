@@ -46,7 +46,7 @@ Triggers a `workflow_dispatch` event on GitHub Actions. The token used (or `gh a
 
 ### 4. Trial mode (creates an isolated sandbox run on GitHub Actions)
 ```bash
-gh aw trial Tyler-R-Kendrick/gh-aw-sdlc/issue-triage --delete-host-repo-after
+gh aw trial owner/repo/issue-triage --delete-host-repo-after
 ```
 Creates a private trial repository, installs the workflow from the specified source, and runs it in isolation so safe-outputs do not affect the real repository. Use `--host-repo` to run directly in an existing repository instead. Also requires write access to GitHub Actions and repo creation permissions.
 
