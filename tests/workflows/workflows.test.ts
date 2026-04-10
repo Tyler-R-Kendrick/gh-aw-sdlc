@@ -259,6 +259,14 @@ describe('Setup prerequisites for coding agents', () => {
   const devcontainer = readFileSync(resolve(REPO_ROOT, '.devcontainer/devcontainer.json'), 'utf-8')
   const copilotSetup = readFileSync(resolve(WORKFLOWS_DIR, 'copilot-setup-steps.yml'), 'utf-8')
 
+  it('installs act in the dev container', () => {
+    expect(devcontainer).toMatch(/devcontainers-extra\/features\/act|act --version|nektos\/act\/master\/install\.sh/)
+  })
+
+  it('installs act in copilot setup steps', () => {
+    expect(copilotSetup).toMatch(/act --version|nektos\/act\/master\/install\.sh/)
+  })
+
   it('installs gh-aw in the dev container', () => {
     expect(devcontainer).toMatch(/gh aw version|install-gh-aw\.sh|gh extension install github\/gh-aw/)
   })

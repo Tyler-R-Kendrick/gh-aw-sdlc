@@ -20,6 +20,16 @@ jobs:
       - name: Install JavaScript dependencies
         run: npm ci
 
+      - name: Install act
+        shell: bash
+        run: |
+          if act --version; then
+            exit 0
+          fi
+
+          curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b /usr/local/bin
+          act --version
+
       - name: Install gh-aw CLI
         shell: bash
         run: |

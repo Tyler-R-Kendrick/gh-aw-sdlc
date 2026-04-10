@@ -8,7 +8,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker": {},
     "ghcr.io/devcontainers-extra/features/act": {}
   },
-  "postCreateCommand": "bash -lc 'npm ci && if gh aw version; then true; elif gh extension install github/gh-aw; then gh aw version; else curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash && gh aw version; fi && npm install skills'",
+  "postCreateCommand": "bash -lc 'act --version && npm ci && if gh aw version; then true; elif gh extension install github/gh-aw; then gh aw version; else curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash && gh aw version; fi && npm install skills'",
   "customizations": {
     "vscode": {
       "extensions": [
