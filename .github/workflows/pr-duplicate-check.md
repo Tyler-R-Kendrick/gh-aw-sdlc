@@ -38,16 +38,18 @@ timeout-minutes: 15
 Reduce duplication across prompts, templates, docs, and workflow specs before review fatigue sets in.
 
 ## Instructions
-1. Inspect changed files in the PR and focus on these asset groups:
+1. Use GitHub MCP tools to read the list of changed files in the PR. Do not use shell `gh`, `curl`, or unsupported helper tools to inspect the pull request.
+2. Focus on these asset groups among the changed files:
    - markdown docs,
    - `.github/prompts/**`,
    - `.github/workflows/*.md`,
    - issue and PR templates,
    - architecture guidance files.
-2. Compare new or modified assets with existing ones for overlapping purpose, wording, and operating scope.
-3. Only comment when there is genuine redundancy risk. Similarity alone is not enough.
-4. The comment must explain:
+3. Compare new or modified assets with existing ones for overlapping purpose, wording, and operating scope.
+4. Only comment when there is genuine redundancy risk. Similarity alone is not enough.
+5. The comment must explain:
    - which assets look overlapping,
    - why they were flagged,
    - whether the suggestion is to merge, simplify, or intentionally keep both.
-5. If the PR does not touch these asset types or no meaningful overlap is found, call `noop`.
+6. If the PR does not touch these asset types or no meaningful overlap is found, call `noop` with a message like `No action needed: no duplicate or overlapping assets detected in the changed files.`
+7. If GitHub reads are unavailable or the PR file list cannot be retrieved, call `noop` explaining the blocker instead of ending with prose only or attempting unsupported tools.
