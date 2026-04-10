@@ -10,6 +10,10 @@ permissions:
   issues: read
   contents: read
 
+engine:
+  id: copilot
+  version: latest
+
 tools:
   github:
     toolsets: [issues, labels]
