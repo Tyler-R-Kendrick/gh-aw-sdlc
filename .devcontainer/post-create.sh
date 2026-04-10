@@ -3,8 +3,15 @@ set -euo pipefail
 
 npm ci
 
-command -v act >/dev/null
-act --version
+if ! command -v act >/dev/null 2>&1; then
+  echo "act is required in the dev container but was not installed. Check the ghcr.io/devcontainers-extra/features/act feature." >&2
+  exit 1
+fi
+
+if ! act --version; then
+  echo "act is installed in the dev container but failed to run." >&2
+  exit 1
+fi
 
 if gh aw version; then
   true
