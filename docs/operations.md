@@ -20,7 +20,7 @@
 - `npm run test:workflows`
 
 ## Coding-agent environment setup
-- The dev container installs `act` and `gh-aw` for local workflow validation.
+- The dev container installs `act` via the devcontainer feature and verifies both `act` and `gh-aw` in `.devcontainer/post-create.sh` for local workflow validation.
 - `.github/workflows/copilot-setup-steps.yml` installs `act` and `gh-aw` for GitHub Copilot coding agents.
 - The standard `CI` workflow includes a `workflow-validation` job so agentic workflow regressions are visible to PR authors and to `ci-doctor`.
 
