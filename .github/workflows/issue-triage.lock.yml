@@ -632,6 +632,11 @@ jobs:
       - name: Clean git credentials
         continue-on-error: true
         run: bash "${RUNNER_TEMP}/gh-aw/actions/clean_git_credentials.sh"
+      - name: Configure Copilot CLI authentication
+        run: |
+          echo "${{ secrets.COPILOT_GITHUB_TOKEN }}" | gh auth login --with-token
+        env:
+          GH_HOST: github.com
       - name: Execute GitHub Copilot CLI
         id: agentic_execution
         # Copilot CLI tool arguments (sorted):
