@@ -13,6 +13,11 @@ permissions:
 engine:
   id: copilot
   version: latest
+  env:
+    COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
+
+features:
+  copilot-requests: true
 
 tools:
   github:
