@@ -20,7 +20,8 @@ jobs:
       - name: Install act
         shell: bash
         run: |
-          if act --version; then
+          if command -v act >/dev/null 2>&1; then
+            act --version
             exit 0
           fi
 
