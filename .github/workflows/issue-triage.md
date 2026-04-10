@@ -1,31 +1,35 @@
 ---
-name: Issue Triage
-description: Triages incoming issues with labels
+timeout-minutes: 5
+
 on:
   issues:
-    types: [opened, edited]
-  schedule:
-    - cron: '17 */6 * * *'
-  workflow_dispatch:
+    types: [opened, reopened]
+
 permissions:
-  contents: read
   issues: read
-engine:
-  id: copilot
-  env:
-    COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
-strict: true
+
 tools:
   github:
-    toolsets: [issues]
+    toolsets: [issues, labels]
+
 safe-outputs:
   add-labels:
-  noop:
-timeout-minutes: 15
+    allowed: [bug, feature, enhancement, documentation, question, help-wanted, good-first-issue]
+  add-comment: {}
 ---
 
-# Issue Triage
+# Issue Triage Agent
 
-Read each open issue and apply the appropriate label from: `bug`, `feature`, `security`, `technical-debt`, `docs`, `architecture`, `needs-triage`, `candidate-agent-work`, `human-review`.
+List open issues in ${{ github.repository }} that have no labels. For each
+unlabeled issue, analyze the title and body, then add one of the allowed
+labels: `bug`, `feature`, `enhancement`, `documentation`, `question`,
+`help-wanted`, or `good-first-issue`.
 
-Use GitHub MCP tools to read issues. If no issues need triage, call `noop`.
+Skip issues that:
+- Already have any of these labels
+- Have been assigned to any user (especially non-bot users)
+
+Do research on the issue in the context of the codebase and, after
+adding the label to an issue, mention the issue author in a comment, explain
+why the label was added and give a brief summary of how the issue may be
+addressed.
