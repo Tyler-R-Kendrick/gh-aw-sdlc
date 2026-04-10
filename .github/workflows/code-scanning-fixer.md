@@ -11,7 +11,6 @@ permissions:
   security-events: read
 engine:
   id: copilot
-  version: 1.0.10
   env:
     COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
 strict: true

@@ -23,6 +23,19 @@ npm run test:api
 npm run test:workflows
 ```
 
+## Testing workflows
+
+Use these `gh aw` commands to test workflows at increasing levels of confidence:
+
+| Command | What it does | Auth needed |
+|---------|-------------|-------------|
+| `gh aw validate [workflow]` | Static lint + security scan, no files generated | None |
+| `gh aw run [workflow] --dry-run` | Confirms workflow is dispatchable, nothing executes | GitHub read |
+| `gh aw run [workflow]` | Triggers real `workflow_dispatch` on GitHub Actions | GitHub Actions write |
+| `gh aw trial owner/repo/workflow` | Isolated run in a private trial repo | GitHub Actions write + repo create |
+
+The coding-agent sandbox can run `gh aw validate` and `--dry-run` but cannot trigger live dispatches (firewall restriction). Run `gh aw run` or `gh aw trial` from a local machine or after merging to `main`.
+
 ## Workflow authoring rules
 - Author GH-AW workflows in markdown under `.github/workflows/`.
 - Recompile lock files with `gh aw compile` whenever workflow frontmatter changes.
