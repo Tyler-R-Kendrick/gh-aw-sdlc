@@ -225,6 +225,21 @@ describe.each(WORKFLOW_SPECS)('Workflow metadata: $name', ({ name, classificatio
   })
 })
 
+describe('Issue triage workflow guidance', () => {
+  const workflow = readWorkflow('issue-triage')
+
+  it('makes scheduled no-op handling explicit', () => {
+    expect(workflow).toContain('If a scheduled/manual run finds no unlabeled or weakly labeled issues, call `noop`')
+    expect(workflow).toContain('No action needed: scheduled backlog sweep found no unlabeled or weakly labeled issues.')
+  })
+
+  it('requires GitHub MCP reads instead of shell fallbacks', () => {
+    expect(workflow).toContain('Use GitHub MCP tools for GitHub reads.')
+    expect(workflow).toContain('Do not use shell `gh`, `curl`, or unsupported helper tools to inspect issues.')
+    expect(workflow).toContain('call `noop` explaining the blocker instead of ending with prose only or attempting unsupported tools.')
+  })
+})
+
 describe.each(WORKFLOW_SPECS)('Lock file structure: $name', ({ name }) => {
   let lock = ''
 
