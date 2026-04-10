@@ -28,7 +28,7 @@ Use these `gh aw` commands to test workflows at increasing levels of confidence:
 gh aw validate                    # validate all workflows with linters
 gh aw validate issue-triage       # validate a specific workflow
 ```
-Runs `compile --no-emit` plus `zizmor`, `actionlint`, and `poutine` linters. Catches syntax errors, security issues, and deprecated fields without generating any files.
+Runs `gh aw compile --no-emit` plus `zizmor`, `actionlint`, and `poutine` linters. Catches syntax errors, security issues, and deprecated fields without generating any files.
 
 ### 2. Dry-run dispatch (GitHub auth required, nothing executes)
 ```bash
