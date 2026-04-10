@@ -46,20 +46,25 @@ timeout-minutes: 20
 Turn failed CI signals into actionable remediation guidance quickly.
 
 ## Instructions
-1. Only act automatically when the triggering `workflow_run` concluded with `failure`. Manual dispatch may be used to re-analyze a run.
-2. Inspect the failed jobs and logs for the `CI` workflow. Prioritize these jobs in the analysis:
+
+**MANDATORY FIRST STEP — gate on failure conclusion:**
+Before doing anything else, use the GitHub MCP `actions` tools to retrieve the most recent completed run of the `CI` workflow and check its conclusion.
+- If the conclusion is **not** `failure` (e.g. `success`, `cancelled`, `skipped`, or any other non-failure value) AND this run was triggered automatically by `workflow_run` (not by `workflow_dispatch`), call `noop` **immediately** with a message like: `"No action needed: the CI workflow run concluded with '{conclusion}', not failure."` Do not proceed further.
+- If triggered by `workflow_dispatch`, continue regardless of conclusion so a human can re-analyze any run on demand.
+
+1. Inspect the failed jobs and logs for the `CI` workflow. Prioritize these jobs in the analysis:
    - `api-tests`
    - `frontend-quality`
    - `workflow-validation`
-3. Classify the failure into one of three buckets:
+2. Classify the failure into one of three buckets:
    - **Code failure**: compilation, lint, test, or assertion errors introduced by the change.
    - **Environmental failure**: network outage, missing secret, missing tool, rate limit, or runner problem.
    - **Flaky failure**: intermittent or non-deterministic failure with evidence of prior success.
-4. If the run is associated with an open PR, leave one comment on that PR that clearly explains:
+3. If the run is associated with an open PR, leave one comment on that PR that clearly explains:
    - what signal triggered the workflow,
    - the suspected root cause category,
    - the most likely next action for the author.
-5. If no PR is associated, open one issue summarizing the failing run, impacted job, evidence, and recommendation.
-6. Be explicit about whether the recommended next step is retry, environment fix, test fix, or code fix.
-7. Never rerun workflows automatically and never mark checks green.
-8. If the run is successful or lacks enough evidence, call `noop` and explain the outcome.
+4. If no PR is associated, open one issue summarizing the failing run, impacted job, evidence, and recommendation.
+5. Be explicit about whether the recommended next step is retry, environment fix, test fix, or code fix.
+6. Never rerun workflows automatically and never mark checks green.
+7. If GitHub reads are unavailable or the run lacks enough evidence to produce a reliable diagnosis, call `noop` explaining the blocker instead of ending with prose only or attempting unsupported tools.
