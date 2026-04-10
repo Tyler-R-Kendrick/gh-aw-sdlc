@@ -1,6 +1,7 @@
 {
     "snyk.advanced.autoSelectOrganization": true,
     "chat.tools.terminal.autoApprove": {
-        "act": true
+        "act": true,
+        "npx vitest": true
     }
 }

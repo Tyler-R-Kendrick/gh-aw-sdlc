@@ -1,21 +1,17 @@
 {
-  "name": "OctoCAT Supply",
-  "image": "mcr.microsoft.com/devcontainers/universal",
-  "hostRequirements": {
-    "storage": "32GB"
-  },
-  "features": {
-    "ghcr.io/devcontainers/features/docker-in-docker": {},
-    "ghcr.io/devcontainers-extra/features/act": {}
-  },
-  "postCreateCommand": "bash .devcontainer/post-create.sh",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "GitHub.copilot",
-        "GitHub.copilot-chat",
-        "github.vscode-github-actions"
-      ]
-    }
-  }
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"features": {
+    	"ghcr.io/devcontainers/features/docker-in-docker": {},
+		"ghcr.io/devcontainers-extra/features/act:1": {},
+		"ghcr.io/devcontainers/features/github-cli:1": {}
+	},
+	"postCreateCommand": "gh extension install github/gh-aw",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilot-chat",
+		        "github.vscode-github-actions"
+			]
+		}
+	}
 }
