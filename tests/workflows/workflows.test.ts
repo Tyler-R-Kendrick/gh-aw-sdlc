@@ -229,6 +229,21 @@ describe.each(WORKFLOW_SPECS)('Workflow metadata: $name', ({ name, classificatio
   })
 })
 
+describe('PR duplicate check workflow guidance', () => {
+  const workflow = readWorkflow('pr-duplicate-check')
+
+  it('makes no-op handling explicit when no overlap is found', () => {
+    expect(workflow).toContain('call `noop`')
+    expect(workflow).toContain('No action needed: no duplicate or overlapping assets detected in the changed files.')
+  })
+
+  it('requires GitHub MCP reads instead of shell fallbacks', () => {
+    expect(workflow).toContain('Use GitHub MCP tools to read the list of changed files in the PR.')
+    expect(workflow).toContain('Do not use shell `gh`, `curl`, or unsupported helper tools to inspect the pull request.')
+    expect(workflow).toContain('call `noop` explaining the blocker instead of ending with prose only or attempting unsupported tools.')
+  })
+})
+
 describe('Issue triage workflow guidance', () => {
   const workflow = readWorkflow('issue-triage')
 
