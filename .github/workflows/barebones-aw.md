@@ -2,6 +2,8 @@
 name: Barebones AW
 description: Minimal manual workflow to validate gh-aw setup
 on:
+  issues:
+    types: [opened]
   workflow_dispatch:
 permissions:
   contents: read
