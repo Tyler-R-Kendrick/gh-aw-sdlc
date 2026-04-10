@@ -10,6 +10,7 @@ permissions:
 engine:
   id: copilot
   env:
+    COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
     COPILOT_MODEL: gpt-41-copilot
 safe-outputs:
   noop:

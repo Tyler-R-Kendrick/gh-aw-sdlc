@@ -14,3 +14,4 @@
 | merged-pr-report | gh-aw copilot-pr-merged-report | Adopt with repo-specific reporting adjustments | daily / weekly schedule | merged PR report issue | analytics | outer | merged PRs |
 | resource-staleness-report | awesome-copilot resource-staleness-report | Adopt | weekly schedule / manual dispatch | staleness issue | automation hygiene | outer | docs / prompts / templates / workflow specs |
 | pr-duplicate-check | awesome-copilot pr-duplicate-check | Conditional adopt | PR opened / updated | duplication advisory comment | review hygiene | inner | PR files |
+| run-project | custom | Custom | manual dispatch | noop with build and test results | build validation | inner | codebase |
