@@ -45,7 +45,13 @@ jobs:
       - name: Install act
         shell: bash
         run: |
-          curl -s https://raw.githubusercontent.com/nektos/act/master/install.sh | sudo bash -s -- -b /usr/local/bin
+          ACT_VERSION="v0.2.87"
+          ACT_ARCHIVE="act_Linux_x86_64.tar.gz"
+          ACT_SHA256="9bbfca7d779f71746233ec65e47fdcb12c4c976c1c97ec085956976fcabee866"
+
+          curl -fsSL -o "/tmp/${ACT_ARCHIVE}" "https://github.com/nektos/act/releases/download/${ACT_VERSION}/${ACT_ARCHIVE}"
+          echo "${ACT_SHA256}  /tmp/${ACT_ARCHIVE}" | sha256sum -c -
+          sudo tar -xzf "/tmp/${ACT_ARCHIVE}" -C /usr/local/bin act
           act --version
       - name: Install gh-aw
         shell: bash

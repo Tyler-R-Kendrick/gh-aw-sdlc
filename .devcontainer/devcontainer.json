@@ -8,7 +8,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker": {},
     "ghcr.io/devcontainers-extra/features/act": {}
   },
-  "postCreateCommand": "bash -lc 'set -euo pipefail\nnpm ci\ncommand -v act >/dev/null\nact --version\nif gh aw version; then\n  true\nelif gh extension install github/gh-aw; then\n  gh aw version\nelse\n  curl -sL https://raw.githubusercontent.com/github/gh-aw/main/install-gh-aw.sh | bash\n  gh aw version\nfi\nnpm install skills'",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
       "extensions": [
