@@ -25,5 +25,6 @@ else
   curl -fsSL -o /tmp/gh-aw-linux-amd64 "${GH_AW_ARCHIVE_URL}"
   echo "${GH_AW_SHA256}  /tmp/gh-aw-linux-amd64" | sha256sum -c -
   sudo install -m 0755 /tmp/gh-aw-linux-amd64 /usr/local/bin/gh-aw
+  rm /tmp/gh-aw-linux-amd64
   gh aw version
 fi
