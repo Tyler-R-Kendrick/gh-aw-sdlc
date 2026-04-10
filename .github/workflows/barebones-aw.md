@@ -7,6 +7,8 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+features:
+  copilot-requests: true
 engine:
   id: copilot
   env:
