@@ -1,5 +1,6 @@
 ---
 timeout-minutes: 5
+strict: false
 
 on:
   issues:
@@ -15,9 +16,7 @@ engine:
   version: latest
   env:
     COPILOT_EXP_COPILOT_CLI_MCP_ALLOWLIST: "false"
-
-features:
-  action-tag: "v0.67.1"
+    GH_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
 
 tools:
   github:
