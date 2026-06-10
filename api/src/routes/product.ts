@@ -121,7 +121,12 @@ router.get('/', (req, res) => {
 
 // Get a product by ID
 router.get('/:id', (req, res) => {
-  const product = products.find(p => p.productId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid product ID');
+    return;
+  }
+  const product = products.find(p => p.productId === id);
   if (product) {
     res.json(product);
   } else {
@@ -131,7 +136,12 @@ router.get('/:id', (req, res) => {
 
 // Update a product by ID
 router.put('/:id', (req, res) => {
-  const index = products.findIndex(p => p.productId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid product ID');
+    return;
+  }
+  const index = products.findIndex(p => p.productId === id);
   if (index !== -1) {
     products[index] = req.body;
     res.json(products[index]);
@@ -142,7 +152,12 @@ router.put('/:id', (req, res) => {
 
 // Delete a product by ID
 router.delete('/:id', (req, res) => {
-  const index = products.findIndex(p => p.productId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid product ID');
+    return;
+  }
+  const index = products.findIndex(p => p.productId === id);
   if (index !== -1) {
     products.splice(index, 1);
     res.status(204).send();

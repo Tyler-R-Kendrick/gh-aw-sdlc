@@ -121,7 +121,12 @@ router.get('/', (req, res) => {
 
 // Get an order by ID
 router.get('/:id', (req, res) => {
-  const order = orders.find(o => o.orderId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid order ID');
+    return;
+  }
+  const order = orders.find(o => o.orderId === id);
   if (order) {
     res.json(order);
   } else {
@@ -131,7 +136,12 @@ router.get('/:id', (req, res) => {
 
 // Update an order by ID
 router.put('/:id', (req, res) => {
-  const index = orders.findIndex(o => o.orderId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid order ID');
+    return;
+  }
+  const index = orders.findIndex(o => o.orderId === id);
   if (index !== -1) {
     orders[index] = req.body;
     res.json(orders[index]);
@@ -142,7 +152,12 @@ router.put('/:id', (req, res) => {
 
 // Delete an order by ID
 router.delete('/:id', (req, res) => {
-  const index = orders.findIndex(o => o.orderId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid order ID');
+    return;
+  }
+  const index = orders.findIndex(o => o.orderId === id);
   if (index !== -1) {
     orders.splice(index, 1);
     res.status(204).send();

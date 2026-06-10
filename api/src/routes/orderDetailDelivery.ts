@@ -121,7 +121,12 @@ router.get('/', (req, res) => {
 
 // Get an order detail delivery by ID
 router.get('/:id', (req, res) => {
-  const orderDetailDelivery = orderDetailDeliveries.find(odd => odd.deliveryId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid order detail delivery ID');
+    return;
+  }
+  const orderDetailDelivery = orderDetailDeliveries.find(odd => odd.deliveryId === id);
   if (orderDetailDelivery) {
     res.json(orderDetailDelivery);
   } else {
@@ -131,7 +136,12 @@ router.get('/:id', (req, res) => {
 
 // Update an order detail delivery by ID
 router.put('/:id', (req, res) => {
-  const index = orderDetailDeliveries.findIndex(odd => odd.deliveryId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid order detail delivery ID');
+    return;
+  }
+  const index = orderDetailDeliveries.findIndex(odd => odd.deliveryId === id);
   if (index !== -1) {
     orderDetailDeliveries[index] = req.body;
     res.json(orderDetailDeliveries[index]);
@@ -142,7 +152,12 @@ router.put('/:id', (req, res) => {
 
 // Delete an order detail delivery by ID
 router.delete('/:id', (req, res) => {
-  const index = orderDetailDeliveries.findIndex(odd => odd.deliveryId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid order detail delivery ID');
+    return;
+  }
+  const index = orderDetailDeliveries.findIndex(odd => odd.deliveryId === id);
   if (index !== -1) {
     orderDetailDeliveries.splice(index, 1);
     res.status(204).send();
