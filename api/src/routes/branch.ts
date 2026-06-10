@@ -126,7 +126,12 @@ router.get('/', (req, res) => {
 
 // Get a branch by ID
 router.get('/:id', (req, res) => {
-  const branch = branches.find(b => b.branchId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid branch ID');
+    return;
+  }
+  const branch = branches.find(b => b.branchId === id);
   if (branch) {
     res.json(branch);
   } else {
@@ -136,7 +141,12 @@ router.get('/:id', (req, res) => {
 
 // Update a branch by ID
 router.put('/:id', (req, res) => {
-  const index = branches.findIndex(b => b.branchId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid branch ID');
+    return;
+  }
+  const index = branches.findIndex(b => b.branchId === id);
   if (index !== -1) {
     branches[index] = req.body;
     res.json(branches[index]);
@@ -147,7 +157,12 @@ router.put('/:id', (req, res) => {
 
 // Delete a branch by ID
 router.delete('/:id', (req, res) => {
-  const index = branches.findIndex(b => b.branchId === parseInt(req.params.id));
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id)) {
+    res.status(400).send('Invalid branch ID');
+    return;
+  }
+  const index = branches.findIndex(b => b.branchId === id);
   if (index !== -1) {
     branches.splice(index, 1);
     res.status(204).send();

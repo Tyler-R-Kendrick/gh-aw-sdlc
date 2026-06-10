@@ -121,7 +121,12 @@ router.get('/', (req, res) => {
 
 // Get a supplier by ID
 router.get('/:id', (req, res) => {
-    const supplier = suppliers.find(s => s.supplierId === parseInt(req.params.id));
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+        res.status(400).send('Invalid supplier ID');
+        return;
+    }
+    const supplier = suppliers.find(s => s.supplierId === id);
     if (supplier) {
         res.json(supplier);
     } else {
@@ -131,7 +136,12 @@ router.get('/:id', (req, res) => {
 
 // Update a supplier by ID
 router.put('/:id', (req, res) => {
-    const index = suppliers.findIndex(s => s.supplierId === parseInt(req.params.id));
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+        res.status(400).send('Invalid supplier ID');
+        return;
+    }
+    const index = suppliers.findIndex(s => s.supplierId === id);
     if (index !== -1) {
         suppliers[index] = req.body;
         res.json(suppliers[index]);
@@ -142,7 +152,12 @@ router.put('/:id', (req, res) => {
 
 // Delete a supplier by ID
 router.delete('/:id', (req, res) => {
-    const index = suppliers.findIndex(s => s.supplierId === parseInt(req.params.id));
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id)) {
+        res.status(400).send('Invalid supplier ID');
+        return;
+    }
+    const index = suppliers.findIndex(s => s.supplierId === id);
     if (index !== -1) {
         suppliers.splice(index, 1);
         res.status(204).send();
