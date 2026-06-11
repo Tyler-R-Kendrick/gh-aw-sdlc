@@ -14,24 +14,35 @@ import supplierRoutes from './routes/supplier';
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Parse CORS origins from environment variable if available
-const corsOrigins = process.env.API_CORS_ORIGINS 
-  ? process.env.API_CORS_ORIGINS.split(',')
-  : [
-      'http://localhost:5137', 
-      'http://localhost:3001',
-      // Allow all Codespace domains
-      /^https:\/\/.*\.app\.github\.dev$/
-    ];
+// Parse CORS origins from environment variable
+// In development, set API_CORS_ORIGINS env var explicitly
+const corsOriginsString = process.env.API_CORS_ORIGINS;
+
+let corsOrigins: (string | RegExp)[] = [];
+
+if (corsOriginsString) {
+  corsOrigins = corsOriginsString.split(',').map(origin => origin.trim());
+} else if (process.env.NODE_ENV === 'development') {
+  // Development: only allow localhost explicitly via env var
+  corsOrigins = [
+    'http://localhost:5137',
+    'http://localhost:3001'
+  ];
+  console.warn('CORS origins not configured via API_CORS_ORIGINS. Using development defaults.');
+} else {
+  // Production: require explicit configuration
+  console.warn('WARNING: API_CORS_ORIGINS environment variable not set. CORS is disabled.');
+  corsOrigins = [];
+}
 
 console.log('Configured CORS origins:', corsOrigins);
 
 // Enable CORS for the frontend
 app.use(cors({
-  origin: corsOrigins,
+  origin: corsOrigins.length > 0 ? corsOrigins : false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // Allow credentials
+  credentials: true
 }));
 
 const swaggerOptions = {
@@ -64,7 +75,7 @@ app.get('/api-docs.json', (req, res) => {
   res.send(swaggerDocs);
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/order-detail-deliveries', orderDetailDeliveryRoutes);
