@@ -14,24 +14,21 @@ import supplierRoutes from './routes/supplier';
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Parse CORS origins from environment variable if available
-const corsOrigins = process.env.API_CORS_ORIGINS 
-  ? process.env.API_CORS_ORIGINS.split(',')
-  : [
-      'http://localhost:5137', 
-      'http://localhost:3001',
-      // Allow all Codespace domains
-      /^https:\/\/.*\.app\.github\.dev$/
-    ];
+// Parse CORS origins from environment variable (required for security)
+const corsOrigins = process.env.API_CORS_ORIGINS?.split(',').filter(Boolean) || [];
 
-console.log('Configured CORS origins:', corsOrigins);
+if (corsOrigins.length === 0) {
+  console.warn('WARNING: API_CORS_ORIGINS not set. CORS will only allow same-origin requests.');
+}
 
-// Enable CORS for the frontend
+console.log('Configured CORS origins:', corsOrigins.length > 0 ? corsOrigins : 'DISABLED (same-origin only)');
+
+// Enable CORS for the frontend with explicit origins
 app.use(cors({
-  origin: corsOrigins,
+  origin: corsOrigins.length > 0 ? corsOrigins : false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true // Allow credentials
+  credentials: corsOrigins.length > 0
 }));
 
 const swaggerOptions = {
@@ -64,7 +61,7 @@ app.get('/api-docs.json', (req, res) => {
   res.send(swaggerDocs);
 });
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/order-detail-deliveries', orderDetailDeliveryRoutes);
