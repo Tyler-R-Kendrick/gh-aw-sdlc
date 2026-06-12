@@ -14,6 +14,8 @@ The inner loop is the branch/PR/build/release-prep path:
 - breaking-change review during PRs
 - changeset generation
 - duplicate asset review in PRs
+- accessibility compliance review
+- OWASP Top 10 security scanning
 
 ## What outer loop means here
 The outer loop is the governance and oversight path:
@@ -23,6 +25,8 @@ The outer loop is the governance and oversight path:
 - daily repo status reporting
 - merged PR analytics
 - workflow/doc/template staleness reporting
+- feature request generation and product discovery
+- documentation synchronization with code changes
 
 ## Signal sources vs GH-AW workflows
 This repo keeps existing scanners and automation in place:
@@ -51,6 +55,13 @@ GH-AW is the analysis, orchestration, triage, remediation, reporting, and govern
 
 ### Custom derivative built from an established pattern
 - `snyk-remediation` ← custom derivative of `code-scanning-fixer`
+- `daily-accessibility-review` ← adapted from githubnext/agentics accessibility review pattern
+- `daily-security-owasp-review` ← extended from gh-aw code-scanning-fixer
+
+### Custom outer-loop workflows
+- `feature-request-generator` ← custom product discovery and backlog generation
+- `daily-doc-updater` ← custom documentation synchronization pattern
+- `barebones-aw` ← custom workflow validation workflow
 
 ## Repo layout
 - `.github/workflows/` — GH-AW markdown workflows, compiled lock files, standard CI, and coding-agent setup

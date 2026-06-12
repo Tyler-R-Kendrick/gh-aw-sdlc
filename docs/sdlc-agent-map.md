@@ -14,3 +14,8 @@
 | merged-pr-report | gh-aw copilot-pr-merged-report | Adopt with repo-specific reporting adjustments | daily / weekly schedule | merged PR report issue | analytics | outer | merged PRs |
 | resource-staleness-report | awesome-copilot resource-staleness-report | Adopt | weekly schedule / manual dispatch | staleness issue | automation hygiene | outer | docs / prompts / templates / workflow specs |
 | pr-duplicate-check | awesome-copilot pr-duplicate-check | Conditional adopt | PR opened / updated | duplication advisory comment | review hygiene | inner | PR files |
+| daily-accessibility-review | githubnext/agentics | Adapt | daily schedule / manual dispatch | accessibility finding issues (up to 5) or noop | quality / accessibility compliance | inner | repository source code, WCAG 2.2 guidelines |
+| daily-security-owasp-review | gh-aw code-scanning-fixer (extended) | Extend | weekday schedule / manual dispatch | remediation PR, security finding issues, or noop | security review | inner | repository source code, GitHub code scanning, npm audit, OWASP Top 10 |
+| feature-request-generator | custom (outer-loop pattern) | Custom | weekly (Monday) / manual dispatch | feature request issues assigned to Copilot (up to 5) or noop | product discovery / backlog generation | outer | codebase analysis, open issues, closed PRs, README gaps, user-facing docs |
+| daily-doc-updater | custom (daily documentation pattern) | Custom | daily schedule / manual dispatch | documentation update PR or noop | documentation maintenance | outer | merged PRs, code changes from last 24 hours |
+| barebones-aw | custom (validation workflow) | Custom | issue opened / manual dispatch | health confirmation noop | workflow validation | n/a | workflow metadata validation |

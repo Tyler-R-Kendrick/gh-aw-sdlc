@@ -10,6 +10,8 @@ The inner loop in this repository covers the workflows that help a contributor m
 - `breaking-change-checker` (PR mode)
 - `changeset-generator`
 - `pr-duplicate-check`
+- `daily-accessibility-review`
+- `daily-security-owasp-review`
 
 ## How developers interact with them
 1. Open or update a pull request.
@@ -17,11 +19,14 @@ The inner loop in this repository covers the workflows that help a contributor m
 3. If the standard `CI` workflow fails, let `ci-doctor` classify the failure before retrying or patching.
 4. If code scanning, Dependabot, or Snyk surfaces a security signal, use the remediation workflow outputs as reviewed starting points rather than auto-merging fixes.
 5. When the PR changes user-visible behavior, apply the `release-note` or `changeset` label so `changeset-generator` can prepare release metadata.
+6. Monitor `daily-accessibility-review` and `daily-security-owasp-review` findings to address accessibility and security issues proactively.
 
 ## How the inner loop accelerates delivery
 - Pull requests get one structured checkpoint comment instead of ad hoc triage.
 - CI failures are translated into likely root causes.
 - Security findings are converted into draft PRs or clearly scoped follow-up work.
+- Accessibility issues are identified proactively across the codebase against WCAG 2.2 standards.
+- OWASP Top 10 vulnerabilities are scanned and remediated systematically.
 - Release-note work is pulled forward into the PR instead of being deferred.
 
 ## How existing tools feed the inner loop
