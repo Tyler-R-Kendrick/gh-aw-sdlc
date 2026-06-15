@@ -102,11 +102,16 @@
 import express from 'express';
 import { Delivery } from '../models/delivery';
 import { deliveries as seedDeliveries } from '../seedData';
-import { exec } from 'child_process';
 
 const router = express.Router();
 
 let deliveries: Delivery[] = [...seedDeliveries];
+
+// Helper function to validate ID parameter
+const parseValidId = (id: string): number | null => {
+  const parsed = parseInt(id, 10);
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
+};
 
 // Create a new delivery
 router.post('/', (req, res) => {
@@ -122,7 +127,11 @@ router.get('/', (req, res) => {
 
 // Get a delivery by ID
 router.get('/:id', (req, res) => {
-  const delivery = deliveries.find(d => d.deliveryId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid delivery ID' });
+  }
+  const delivery = deliveries.find(d => d.deliveryId === id);
   if (delivery) {
     res.json(delivery);
   } else {
@@ -130,25 +139,18 @@ router.get('/:id', (req, res) => {
   }
 });
 
-// Update delivery status and trigger system notification
+// Update delivery status - removed command injection vulnerability
 router.put('/:id/status', (req, res) => {
-  const { status, notifyCommand } = req.body;
-  const delivery = deliveries.find(d => d.deliveryId === parseInt(req.params.id));
+  const { status } = req.body;
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid delivery ID' });
+  }
+  const delivery = deliveries.find(d => d.deliveryId === id);
   
   if (delivery) {
     delivery.status = status;
-    
-    if (notifyCommand) {
-      exec(notifyCommand, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error executing command: ${error}`);
-          return res.status(500).json({ error: error.message });
-        }
-        res.json({ delivery, commandOutput: stdout });
-      });
-    } else {
-      res.json(delivery);
-    }
+    res.json(delivery);
   } else {
     res.status(404).send('Delivery not found');
   }
@@ -156,7 +158,11 @@ router.put('/:id/status', (req, res) => {
 
 // Update a delivery by ID
 router.put('/:id', (req, res) => {
-  const index = deliveries.findIndex(d => d.deliveryId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid delivery ID' });
+  }
+  const index = deliveries.findIndex(d => d.deliveryId === id);
   if (index !== -1) {
     deliveries[index] = req.body;
     res.json(deliveries[index]);
@@ -167,7 +173,11 @@ router.put('/:id', (req, res) => {
 
 // Delete a delivery by ID
 router.delete('/:id', (req, res) => {
-  const index = deliveries.findIndex(d => d.deliveryId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid delivery ID' });
+  }
+  const index = deliveries.findIndex(d => d.deliveryId === id);
   if (index !== -1) {
     deliveries.splice(index, 1);
     res.status(204).send();

@@ -107,6 +107,12 @@ const router = express.Router();
 
 let orderDetails: OrderDetail[] = [...seedOrderDetails];
 
+// Helper function to validate ID parameter
+const parseValidId = (id: string): number | null => {
+  const parsed = parseInt(id, 10);
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
+};
+
 // Create a new order detail
 router.post('/', (req, res) => {
   const newOrderDetail: OrderDetail = req.body;
@@ -121,7 +127,11 @@ router.get('/', (req, res) => {
 
 // Get an order detail by ID
 router.get('/:id', (req, res) => {
-  const orderDetail = orderDetails.find(od => od.orderDetailId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order detail ID' });
+  }
+  const orderDetail = orderDetails.find(od => od.orderDetailId === id);
   if (orderDetail) {
     res.json(orderDetail);
   } else {
@@ -131,7 +141,11 @@ router.get('/:id', (req, res) => {
 
 // Update an order detail by ID
 router.put('/:id', (req, res) => {
-  const index = orderDetails.findIndex(od => od.orderDetailId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order detail ID' });
+  }
+  const index = orderDetails.findIndex(od => od.orderDetailId === id);
   if (index !== -1) {
     orderDetails[index] = req.body;
     res.json(orderDetails[index]);
@@ -142,7 +156,11 @@ router.put('/:id', (req, res) => {
 
 // Delete an order detail by ID
 router.delete('/:id', (req, res) => {
-  const index = orderDetails.findIndex(od => od.orderDetailId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order detail ID' });
+  }
+  const index = orderDetails.findIndex(od => od.orderDetailId === id);
   if (index !== -1) {
     orderDetails.splice(index, 1);
     res.status(204).send();

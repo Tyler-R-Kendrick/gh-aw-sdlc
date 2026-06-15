@@ -107,6 +107,12 @@ const router = express.Router();
 
 let headquartersList: Headquarters[] = [...seedHeadquarters];
 
+// Helper function to validate ID parameter
+const parseValidId = (id: string): number | null => {
+  const parsed = parseInt(id, 10);
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
+};
+
 // Create a new headquarters
 router.post('/', (req, res) => {
   const newHeadquarters: Headquarters = req.body;
@@ -121,7 +127,11 @@ router.get('/', (req, res) => {
 
 // Get a headquarters by ID
 router.get('/:id', (req, res) => {
-  const headquarters = headquartersList.find(h => h.headquartersId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid headquarters ID' });
+  }
+  const headquarters = headquartersList.find(h => h.headquartersId === id);
   if (headquarters) {
     res.json(headquarters);
   } else {
@@ -131,7 +141,11 @@ router.get('/:id', (req, res) => {
 
 // Update a headquarters by ID
 router.put('/:id', (req, res) => {
-  const index = headquartersList.findIndex(h => h.headquartersId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid headquarters ID' });
+  }
+  const index = headquartersList.findIndex(h => h.headquartersId === id);
   if (index !== -1) {
     headquartersList[index] = req.body;
     res.json(headquartersList[index]);
@@ -142,7 +156,11 @@ router.put('/:id', (req, res) => {
 
 // Delete a headquarters by ID
 router.delete('/:id', (req, res) => {
-  const index = headquartersList.findIndex(h => h.headquartersId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid headquarters ID' });
+  }
+  const index = headquartersList.findIndex(h => h.headquartersId === id);
   if (index !== -1) {
     headquartersList.splice(index, 1);
     res.status(204).send();

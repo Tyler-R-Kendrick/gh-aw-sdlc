@@ -107,6 +107,12 @@ const router = express.Router();
 
 let suppliers: Supplier[] = [...seedSuppliers];
 
+// Helper function to validate ID parameter
+const parseValidId = (id: string): number | null => {
+  const parsed = parseInt(id, 10);
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
+};
+
 // Create a new supplier
 router.post('/', (req, res) => {
     const newSupplier = req.body as Supplier;
@@ -121,7 +127,11 @@ router.get('/', (req, res) => {
 
 // Get a supplier by ID
 router.get('/:id', (req, res) => {
-    const supplier = suppliers.find(s => s.supplierId === parseInt(req.params.id));
+    const id = parseValidId(req.params.id);
+    if (id === null) {
+        return res.status(400).json({ error: 'Invalid supplier ID' });
+    }
+    const supplier = suppliers.find(s => s.supplierId === id);
     if (supplier) {
         res.json(supplier);
     } else {
@@ -131,7 +141,11 @@ router.get('/:id', (req, res) => {
 
 // Update a supplier by ID
 router.put('/:id', (req, res) => {
-    const index = suppliers.findIndex(s => s.supplierId === parseInt(req.params.id));
+    const id = parseValidId(req.params.id);
+    if (id === null) {
+        return res.status(400).json({ error: 'Invalid supplier ID' });
+    }
+    const index = suppliers.findIndex(s => s.supplierId === id);
     if (index !== -1) {
         suppliers[index] = req.body;
         res.json(suppliers[index]);
@@ -142,7 +156,11 @@ router.put('/:id', (req, res) => {
 
 // Delete a supplier by ID
 router.delete('/:id', (req, res) => {
-    const index = suppliers.findIndex(s => s.supplierId === parseInt(req.params.id));
+    const id = parseValidId(req.params.id);
+    if (id === null) {
+        return res.status(400).json({ error: 'Invalid supplier ID' });
+    }
+    const index = suppliers.findIndex(s => s.supplierId === id);
     if (index !== -1) {
         suppliers.splice(index, 1);
         res.status(204).send();

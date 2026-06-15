@@ -107,6 +107,12 @@ const router = express.Router();
 
 let branches: Branch[] = [...seedBranches];
 
+// Helper function to validate ID parameter
+const parseValidId = (id: string): number | null => {
+  const parsed = parseInt(id, 10);
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
+};
+
 // Add reset function for testing
 export const resetBranches = () => {
   branches = [...seedBranches];
@@ -126,7 +132,11 @@ router.get('/', (req, res) => {
 
 // Get a branch by ID
 router.get('/:id', (req, res) => {
-  const branch = branches.find(b => b.branchId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid branch ID' });
+  }
+  const branch = branches.find(b => b.branchId === id);
   if (branch) {
     res.json(branch);
   } else {
@@ -136,7 +146,11 @@ router.get('/:id', (req, res) => {
 
 // Update a branch by ID
 router.put('/:id', (req, res) => {
-  const index = branches.findIndex(b => b.branchId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid branch ID' });
+  }
+  const index = branches.findIndex(b => b.branchId === id);
   if (index !== -1) {
     branches[index] = req.body;
     res.json(branches[index]);
@@ -147,7 +161,11 @@ router.put('/:id', (req, res) => {
 
 // Delete a branch by ID
 router.delete('/:id', (req, res) => {
-  const index = branches.findIndex(b => b.branchId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid branch ID' });
+  }
+  const index = branches.findIndex(b => b.branchId === id);
   if (index !== -1) {
     branches.splice(index, 1);
     res.status(204).send();
