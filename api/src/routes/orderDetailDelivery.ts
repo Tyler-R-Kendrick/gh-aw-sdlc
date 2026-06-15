@@ -107,6 +107,12 @@ const router = express.Router();
 
 let orderDetailDeliveries: OrderDetailDelivery[] = [...seedOrderDetailDeliveries];
 
+// Helper function to validate ID parameter
+const parseValidId = (id: string): number | null => {
+  const parsed = parseInt(id, 10);
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
+};
+
 // Create a new order detail delivery
 router.post('/', (req, res) => {
   const newOrderDetailDelivery: OrderDetailDelivery = req.body;
@@ -121,7 +127,11 @@ router.get('/', (req, res) => {
 
 // Get an order detail delivery by ID
 router.get('/:id', (req, res) => {
-  const orderDetailDelivery = orderDetailDeliveries.find(odd => odd.deliveryId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order detail delivery ID' });
+  }
+  const orderDetailDelivery = orderDetailDeliveries.find(odd => odd.orderDetailDeliveryId === id);
   if (orderDetailDelivery) {
     res.json(orderDetailDelivery);
   } else {
@@ -131,7 +141,11 @@ router.get('/:id', (req, res) => {
 
 // Update an order detail delivery by ID
 router.put('/:id', (req, res) => {
-  const index = orderDetailDeliveries.findIndex(odd => odd.deliveryId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order detail delivery ID' });
+  }
+  const index = orderDetailDeliveries.findIndex(odd => odd.orderDetailDeliveryId === id);
   if (index !== -1) {
     orderDetailDeliveries[index] = req.body;
     res.json(orderDetailDeliveries[index]);
@@ -142,7 +156,11 @@ router.put('/:id', (req, res) => {
 
 // Delete an order detail delivery by ID
 router.delete('/:id', (req, res) => {
-  const index = orderDetailDeliveries.findIndex(odd => odd.deliveryId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order detail delivery ID' });
+  }
+  const index = orderDetailDeliveries.findIndex(odd => odd.orderDetailDeliveryId === id);
   if (index !== -1) {
     orderDetailDeliveries.splice(index, 1);
     res.status(204).send();

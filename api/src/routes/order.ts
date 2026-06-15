@@ -107,6 +107,12 @@ const router = express.Router();
 
 let orders: Order[] = [...seedOrders];
 
+// Helper function to validate ID parameter
+const parseValidId = (id: string): number | null => {
+  const parsed = parseInt(id, 10);
+  return Number.isNaN(parsed) || parsed <= 0 ? null : parsed;
+};
+
 // Create a new order
 router.post('/', (req, res) => {
   const newOrder: Order = req.body;
@@ -121,7 +127,11 @@ router.get('/', (req, res) => {
 
 // Get an order by ID
 router.get('/:id', (req, res) => {
-  const order = orders.find(o => o.orderId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order ID' });
+  }
+  const order = orders.find(o => o.orderId === id);
   if (order) {
     res.json(order);
   } else {
@@ -131,7 +141,11 @@ router.get('/:id', (req, res) => {
 
 // Update an order by ID
 router.put('/:id', (req, res) => {
-  const index = orders.findIndex(o => o.orderId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order ID' });
+  }
+  const index = orders.findIndex(o => o.orderId === id);
   if (index !== -1) {
     orders[index] = req.body;
     res.json(orders[index]);
@@ -142,7 +156,11 @@ router.put('/:id', (req, res) => {
 
 // Delete an order by ID
 router.delete('/:id', (req, res) => {
-  const index = orders.findIndex(o => o.orderId === parseInt(req.params.id));
+  const id = parseValidId(req.params.id);
+  if (id === null) {
+    return res.status(400).json({ error: 'Invalid order ID' });
+  }
+  const index = orders.findIndex(o => o.orderId === id);
   if (index !== -1) {
     orders.splice(index, 1);
     res.status(204).send();
