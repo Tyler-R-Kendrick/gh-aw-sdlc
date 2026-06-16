@@ -24,7 +24,10 @@ const corsOrigins = process.env.API_CORS_ORIGINS
       /^https:\/\/.*\.app\.github\.dev$/
     ];
 
-console.log('Configured CORS origins:', corsOrigins);
+// Log CORS config only in debug mode
+if (process.env.DEBUG === 'true') {
+  console.log('Configured CORS origins:', corsOrigins);
+}
 
 // Enable CORS for the frontend
 app.use(cors({
@@ -81,5 +84,7 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-  console.log(`API documentation is available at http://localhost:${port}/api-docs`);
+  if (process.env.DEBUG === 'true') {
+    console.log(`API documentation is available at http://localhost:${port}/api-docs`);
+  }
 });
