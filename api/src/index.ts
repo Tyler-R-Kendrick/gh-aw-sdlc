@@ -16,12 +16,10 @@ const port = process.env.PORT || 3000;
 
 // Parse CORS origins from environment variable if available
 const corsOrigins = process.env.API_CORS_ORIGINS 
-  ? process.env.API_CORS_ORIGINS.split(',')
+  ? process.env.API_CORS_ORIGINS.split(',').map(o => o.trim())
   : [
       'http://localhost:5137', 
-      'http://localhost:3001',
-      // Allow all Codespace domains
-      /^https:\/\/.*\.app\.github\.dev$/
+      'http://localhost:3001'
     ];
 
 console.log('Configured CORS origins:', corsOrigins);
