@@ -36,9 +36,13 @@ export default function Login() {
         
         {error && (
           <div 
+            role="alert"
+            aria-live="polite"
+            aria-atomic="true"
             className="bg-red-500/10 border border-red-500 text-red-500 rounded-md p-3 mb-4"
-            dangerouslySetInnerHTML={{ __html: error }}
-          />
+          >
+            {error}
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
