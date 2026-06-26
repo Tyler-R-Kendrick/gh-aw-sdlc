@@ -24,8 +24,6 @@ const corsOrigins = process.env.API_CORS_ORIGINS
       /^https:\/\/.*\.app\.github\.dev$/
     ];
 
-console.log('Configured CORS origins:', corsOrigins);
-
 // Enable CORS for the frontend
 app.use(cors({
   origin: corsOrigins,
